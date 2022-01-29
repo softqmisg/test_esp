@@ -8,15 +8,18 @@
 #define XM 25
 #define YM 32
 #define XP 33
+const lv_point_t points_array[]={{32,100},{142,100}};
 
-TFT_eSPI tft = TFT_eSPI();
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 340);
 
-// TSPoint oldPoint;
+TSPoint oldPoint;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf[TFT_WIDTH * 10];
 lv_disp_drv_t disp_drv;
 lv_indev_drv_t indev_drv;
+lv_indev_drv_t indev_drv_button;
 
+TFT_eSPI tft = TFT_eSPI();
 lv_obj_t *btn1;
 lv_obj_t *btn2;
 lv_obj_t *screenMain;
@@ -37,24 +40,43 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
 {
-  // TSPoint p = ts.getPoint();
+  TSPoint p = ts.getPoint();
   
-  // if (p.z > ts.pressureThreshhold){
-  //   data->state = LV_INDEV_STATE_PR;
-  //   data->point.x = p.x*240/1024;
-  //   data->point.y = p.y*320/1024;
-  //   oldPoint.x = p.x;
-  //   oldPoint.y = p.y;
-  // }
-  // else {
-  //   data->state = LV_INDEV_STATE_REL;
-  //   data->point.x = oldPoint.x*240/1024;
-  //   data->point.y = oldPoint.y*320/1024;
-  // }
+  if (p.z > ts.pressureThreshhold){
+    data->state = LV_INDEV_STATE_PR;
+    data->point.x = p.x*240/1024;
+    data->point.y = p.y*320/1024;
+    oldPoint.x = p.x;
+    oldPoint.y = p.y;
+  }
+  else {
+    data->state = LV_INDEV_STATE_REL;
+    data->point.x = oldPoint.x*240/1024;
+    data->point.y = oldPoint.y*320/1024;
+  }
 
   // return false; /*No buffering now so no more data read*/
 }
 
+int my_btn_read(void)
+{
+  int ID=-1;
+  return ID;
+}
+void button_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
+  static uint32_t last_btn=0;
+  int btn_ptr=my_btn_read();
+  if(btn_ptr>=0)
+  {
+    last_btn=btn_ptr;
+    data->state=LV_INDEV_STATE_PRESSED;
+  }
+  else
+  {
+    data->state=LV_INDEV_STATE_RELEASED;
+  }
+  data->btn_id=last_btn;
+}
 static void event_handler_btn( lv_event_t *e){
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *obj=lv_event_get_target(e);
@@ -95,6 +117,14 @@ void setup() {
   indev_drv.read_cb = my_input_read;
   lv_indev_drv_register(&indev_drv);
 
+  lv_indev_drv_init(&indev_drv_button);
+  indev_drv_button.type=LV_INDEV_TYPE_BUTTON;
+  indev_drv_button.read_cb=button_read;
+  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
+  lv_indev_set_button_points(my_indev,points_array);
+  // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
+  // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
+  
   /*Create screen objects*/
 
   screenMain = lv_obj_create(NULL);
