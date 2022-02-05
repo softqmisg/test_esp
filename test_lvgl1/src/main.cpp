@@ -114,6 +114,26 @@ void setup() {
   disp_drv.draw_buf = &disp_buf;
   lv_disp_drv_register(&disp_drv);
   
+    /*Initialize the input device driver*/
+  
+  // lv_indev_drv_init(&indev_drv);
+  // indev_drv.type = LV_INDEV_TYPE_POINTER;
+  // indev_drv.read_cb = my_input_read;
+  // lv_indev_drv_register(&indev_drv);
+
+  lv_indev_drv_init(&indev_drv_button);
+  indev_drv_button.type=LV_INDEV_TYPE_ENCODER;
+  indev_drv_button.read_cb=encoder_with_keys_read;
+  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
+  
+  // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
+  // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
+  // https://docs.lvgl.io/latest/en/html/porting/indev.html
+  
+  lv_group_t * g = lv_group_create();
+  lv_group_set_default(g);
+  lv_indev_set_group(my_indev,g);
+
   /*Create screen objects*/
 
   screenMain = lv_obj_create(NULL);
@@ -143,27 +163,7 @@ void setup() {
   lv_obj_t * label2 = lv_label_create(btn2);
   lv_label_set_text(label2, "Goodbye");
 
-  /*Initialize the input device driver*/
-  
-  // lv_indev_drv_init(&indev_drv);
-  // indev_drv.type = LV_INDEV_TYPE_POINTER;
-  // indev_drv.read_cb = my_input_read;
-  // lv_indev_drv_register(&indev_drv);
 
-  lv_indev_drv_init(&indev_drv_button);
-  indev_drv_button.type=LV_INDEV_TYPE_ENCODER;
-  indev_drv_button.read_cb=encoder_with_keys_read;
-  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
-  
-
-  // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
-  // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
-  // https://docs.lvgl.io/latest/en/html/porting/indev.html
-  
-  lv_group_t * g = lv_group_create();
-  lv_group_add_obj(g,btn1);
-  lv_group_add_obj(g,btn2);
-  lv_indev_set_group(my_indev,g);
   
   lv_scr_load(screenMain);  
 }
