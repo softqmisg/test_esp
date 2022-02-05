@@ -182,7 +182,7 @@ void setup() {
   lv_indev_set_group(my_indev,g);
   
   lv_scr_load(screenMain);  
-  
+
 }
 
 void loop() {
