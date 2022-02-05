@@ -182,6 +182,7 @@ void setup() {
   lv_indev_set_group(my_indev,g);
   
   lv_scr_load(screenMain);  
+  
 }
 
 void loop() {
@@ -191,6 +192,6 @@ void loop() {
   // Serial.println(digitalRead(PIN_LEFT));
   // Serial.println(digitalRead(PIN_RIGHT));
   // Serial.println("=======");
-  
+
   delay(1);
 }
