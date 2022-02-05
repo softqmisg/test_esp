@@ -66,11 +66,11 @@ int my_keys_read(void)
 
 void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
   static uint32_t last_btn = 0;   /*Store the last pressed button*/
-  int key_pr = my_keys_read();     /*Get the ID (0,1,2...) of the pressed button*/
+  int key_pr = my_keys_read();     /* use LV_KEY_ENTER for encoder press */
   if(key_pr>=0)
   {
     last_btn = key_pr;            /*Get the last pressed or released key*/
-                                     /* use LV_KEY_ENTER for encoder press */
+                                     
     data->state = LV_INDEV_STATE_PR;
   }
   else
@@ -113,9 +113,6 @@ void setup() {
   disp_drv.flush_cb = my_disp_flush;
   disp_drv.draw_buf = &disp_buf;
   lv_disp_drv_register(&disp_drv);
-
-
-
   
   /*Create screen objects*/
 
@@ -163,11 +160,11 @@ void setup() {
   // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
   // https://docs.lvgl.io/latest/en/html/porting/indev.html
   
-  // lv_group_t * g = lv_group_create();
-  // lv_group_add_obj(g,btn1);
-  // lv_group_add_obj(g,btn2);
-  // lv_indev_set_group(my_indev,g);
-
+  lv_group_t * g = lv_group_create();
+  lv_group_add_obj(g,btn1);
+  lv_group_add_obj(g,btn2);
+  lv_indev_set_group(my_indev,g);
+  
   lv_scr_load(screenMain);  
 }
 
