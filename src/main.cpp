@@ -12,7 +12,6 @@
 #define PIN_ENTER 22
 #define PIN_RIGHT 3
 #define PIN_LEFT 21
-
 // const lv_point_t points_array[]={{32,100},{142,100}};
 
 // TouchScreen ts = TouchScreen(XP, YP, XM, YM, 340);
