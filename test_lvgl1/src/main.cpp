@@ -16,7 +16,7 @@ TSPoint oldPoint;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf[TFT_WIDTH * 10];
 lv_disp_drv_t disp_drv;
-lv_indev_drv_t indev_drv;
+// lv_indev_drv_t indev_drv;
 lv_indev_drv_t indev_drv_button;
 
 TFT_eSPI tft = TFT_eSPI();
@@ -58,28 +58,32 @@ void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
   // return false; /*No buffering now so no more data read*/
 }
 
-int my_btn_read(void)
+int my_keys_read(void)
 {
-  int ID=-1;
+  int ID=-1;//LV_KEY_ENTER; LV_KEY_RIGHT ;//LV_KEY_LEFT
   return ID;
 }
-void button_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
-  static uint32_t last_btn=0;
-  int btn_ptr=my_btn_read();
-  if(btn_ptr>=0)
+
+void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
+  static uint32_t last_btn = 0;   /*Store the last pressed button*/
+  int key_pr = my_keys_read();     /*Get the ID (0,1,2...) of the pressed button*/
+  if(key_pr>=0)
   {
-    last_btn=btn_ptr;
-    data->state=LV_INDEV_STATE_PRESSED;
+    last_btn = key_pr;            /*Get the last pressed or released key*/
+                                     /* use LV_KEY_ENTER for encoder press */
+    data->state = LV_INDEV_STATE_PR;
   }
   else
   {
-    data->state=LV_INDEV_STATE_RELEASED;
+    data->state = LV_INDEV_STATE_REL;
   }
-  data->btn_id=last_btn;
+ data->key = last_btn;
 }
+
 static void event_handler_btn( lv_event_t *e){
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *obj=lv_event_get_target(e);
+    Serial.println(code);
     if(code == LV_EVENT_CLICKED) {
         if (obj == btn1)
         lv_label_set_text(label, "Hello");
@@ -110,20 +114,8 @@ void setup() {
   disp_drv.draw_buf = &disp_buf;
   lv_disp_drv_register(&disp_drv);
 
-  /*Initialize the input device driver*/
-  
-  lv_indev_drv_init(&indev_drv);
-  indev_drv.type = LV_INDEV_TYPE_POINTER;
-  indev_drv.read_cb = my_input_read;
-  lv_indev_drv_register(&indev_drv);
 
-  lv_indev_drv_init(&indev_drv_button);
-  indev_drv_button.type=LV_INDEV_TYPE_BUTTON;
-  indev_drv_button.read_cb=button_read;
-  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
-  lv_indev_set_button_points(my_indev,points_array);
-  // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
-  // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
+
   
   /*Create screen objects*/
 
@@ -153,6 +145,28 @@ void setup() {
 
   lv_obj_t * label2 = lv_label_create(btn2);
   lv_label_set_text(label2, "Goodbye");
+
+  /*Initialize the input device driver*/
+  
+  // lv_indev_drv_init(&indev_drv);
+  // indev_drv.type = LV_INDEV_TYPE_POINTER;
+  // indev_drv.read_cb = my_input_read;
+  // lv_indev_drv_register(&indev_drv);
+
+  lv_indev_drv_init(&indev_drv_button);
+  indev_drv_button.type=LV_INDEV_TYPE_ENCODER;
+  indev_drv_button.read_cb=encoder_with_keys_read;
+  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
+  
+
+  // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
+  // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
+  // https://docs.lvgl.io/latest/en/html/porting/indev.html
+  
+  // lv_group_t * g = lv_group_create();
+  // lv_group_add_obj(g,btn1);
+  // lv_group_add_obj(g,btn2);
+  // lv_indev_set_group(my_indev,g);
 
   lv_scr_load(screenMain);  
 }
