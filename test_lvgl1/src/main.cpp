@@ -1,23 +1,28 @@
 #include <Arduino.h>
 #include "SPI.h"
-#include "TouchScreen.h"
+// #include "TouchScreen.h"
 #include "TFT_eSPI.h"
 #include "lvgl.h"
 
-#define YP 26
-#define XM 25
-#define YM 32
-#define XP 33
-const lv_point_t points_array[]={{32,100},{142,100}};
+#define PIN_LEFT  21
+#define PIN_RIGHT  21
+#define PIN_ENTER  21
 
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 340);
+// #define YP 26
+// #define XM 25
+// #define YM 32
+// #define XP 33
+// const lv_point_t points_array[]={{32,100},{142,100}};
 
-TSPoint oldPoint;
+// TouchScreen ts = TouchScreen(XP, YP, XM, YM, 340);
+
+// TSPoint oldPoint;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf[TFT_WIDTH * 10];
 lv_disp_drv_t disp_drv;
 // lv_indev_drv_t indev_drv;
 lv_indev_drv_t indev_drv_button;
+lv_indev_t *my_indev;
 
 TFT_eSPI tft = TFT_eSPI();
 lv_obj_t *btn1;
@@ -38,29 +43,36 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
     lv_disp_flush_ready(disp);
 }
-void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
-{
-  TSPoint p = ts.getPoint();
+// void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
+// {
+//   TSPoint p = ts.getPoint();
   
-  if (p.z > ts.pressureThreshhold){
-    data->state = LV_INDEV_STATE_PR;
-    data->point.x = p.x*240/1024;
-    data->point.y = p.y*320/1024;
-    oldPoint.x = p.x;
-    oldPoint.y = p.y;
-  }
-  else {
-    data->state = LV_INDEV_STATE_REL;
-    data->point.x = oldPoint.x*240/1024;
-    data->point.y = oldPoint.y*320/1024;
-  }
+//   if (p.z > ts.pressureThreshhold){
+//     data->state = LV_INDEV_STATE_PR;
+//     data->point.x = p.x*240/1024;
+//     data->point.y = p.y*320/1024;
+//     oldPoint.x = p.x;
+//     oldPoint.y = p.y;
+//   }
+//   else {
+//     data->state = LV_INDEV_STATE_REL;
+//     data->point.x = oldPoint.x*240/1024;
+//     data->point.y = oldPoint.y*320/1024;
+//   }
 
-  // return false; /*No buffering now so no more data read*/
-}
+//   // return false; /*No buffering now so no more data read*/
+// }
 
 int my_keys_read(void)
 {
   int ID=-1;//LV_KEY_ENTER; LV_KEY_RIGHT ;//LV_KEY_LEFT
+  if(!digitalRead(PIN_LEFT))
+    ID=LV_KEY_LEFT;
+  if(!digitalRead(PIN_RIGHT))
+    ID=LV_KEY_RIGHT;
+  if(!digitalRead(PIN_ENTER))
+    ID=LV_KEY_ENTER;
+    
   return ID;
 }
 
@@ -96,6 +108,9 @@ static void event_handler_btn( lv_event_t *e){
 void setup() {
   // put your setup code here, to run once:
    Serial.begin(9600);
+   pinMode(PIN_LEFT,INPUT_PULLUP);
+   pinMode(PIN_RIGHT,INPUT_PULLUP);
+   pinMode(PIN_ENTER,INPUT_PULLUP);
   tft.begin();
   tft.setRotation(0);
   // analogReadResolution(10);
@@ -124,7 +139,7 @@ void setup() {
   lv_indev_drv_init(&indev_drv_button);
   indev_drv_button.type=LV_INDEV_TYPE_ENCODER;
   indev_drv_button.read_cb=encoder_with_keys_read;
-  lv_indev_t *my_indev= lv_indev_drv_register(&indev_drv_button);
+  my_indev= lv_indev_drv_register(&indev_drv_button);
   
   // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
   // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
