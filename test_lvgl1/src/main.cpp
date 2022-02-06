@@ -5,8 +5,8 @@
 #include "lvgl.h"
 
 #define PIN_LEFT  21
-#define PIN_RIGHT  21
-#define PIN_ENTER  21
+#define PIN_RIGHT  3
+#define PIN_ENTER  22
 
 // #define YP 26
 // #define XM 25
@@ -95,7 +95,7 @@ void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
 static void event_handler_btn( lv_event_t *e){
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *obj=lv_event_get_target(e);
-    Serial.println(code);
+    // Serial.println(code);
     if(code == LV_EVENT_CLICKED) {
         if (obj == btn1)
         lv_label_set_text(label, "Hello");
@@ -112,7 +112,7 @@ void setup() {
    pinMode(PIN_RIGHT,INPUT_PULLUP);
    pinMode(PIN_ENTER,INPUT_PULLUP);
   tft.begin();
-  tft.setRotation(0);
+  tft.setRotation(3);
   // analogReadResolution(10);
 
   // oldPoint = ts.getPoint();
@@ -123,8 +123,8 @@ void setup() {
   /*Initialize the display*/
   
   lv_disp_drv_init(&disp_drv);
-  disp_drv.hor_res = 240;
-  disp_drv.ver_res = 320;
+  disp_drv.hor_res = 320;
+  disp_drv.ver_res = 240;
   disp_drv.flush_cb = my_disp_flush;
   disp_drv.draw_buf = &disp_buf;
   lv_disp_drv_register(&disp_drv);
@@ -153,12 +153,41 @@ void setup() {
 
   screenMain = lv_obj_create(NULL);
 
+
+  label=lv_label_create(screenMain);
+  lv_label_set_recolor(label,true);
+  lv_label_set_text(label,  LV_SYMBOL_OK "#00ff00 Apply #" "#0000ff \xef\x87\xab #" "#ff0000 \xef\x8a\x93 #");  //LV_SYMBOL_SD_CARD LV_SYMBOL_BLUETOOTH LV_SYMBOL_BATTERY_EMPTY);
+  lv_obj_set_size(label, 240, 40);
+  lv_obj_set_pos(label, 40, 150);
+  lv_obj_set_style_text_font(label,&lv_font_montserrat_20,0 );
+  // lv_obj_set_style_text_color(label,lv_color_hex(0xff0000),0);//LV_PALETTE_YELLOW
+  // lv_obj_set_style_text_color(label,lv_palette_main(LV_PALETTE_GREEN),0);
+
+    static lv_style_t style;
+    lv_style_init(&style);
+
+    lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_border_width(&style, 5);
+    lv_style_set_border_opa(&style, LV_OPA_50);
+    lv_style_set_border_side(&style, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
+
+  label = lv_label_create(screenMain);
+  lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(label, "سلام مهدی: this is start");
+  lv_obj_set_align(label,LV_TEXT_ALIGN_CENTER);
+  lv_obj_set_style_base_dir(label, LV_BASE_DIR_AUTO, 0);
+  lv_obj_set_size(label, 240, 40);
+  lv_obj_set_pos(label, 0, 180);
+  lv_obj_set_style_text_font(label, &lv_font_dejavu_16_persian_hebrew, 0);
+  lv_obj_add_style(label, &style, 0);
+
   label = lv_label_create(screenMain);
   lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
   lv_label_set_text(label, "Press a button");
   lv_obj_set_align(label,LV_TEXT_ALIGN_CENTER);
-  lv_obj_set_size(label, 240, 40);
+  lv_obj_set_size(label, 320, 40);
   lv_obj_set_pos(label, 0, 15);
+  lv_obj_set_style_text_font(label,&lv_font_montserrat_34,0 );
 
   btn1 = lv_btn_create(screenMain);
   lv_obj_add_event_cb(btn1,event_handler_btn,LV_EVENT_ALL,NULL);
