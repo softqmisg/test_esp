@@ -28,6 +28,7 @@ lv_indev_t *my_indev;
 TFT_eSPI tft = TFT_eSPI();
 lv_obj_t *btn1;
 lv_obj_t *btn2;
+lv_obj_t *btn3;
 lv_obj_t *screenMain;
 lv_obj_t *label;
 
@@ -99,10 +100,11 @@ static void event_handler_btn( lv_event_t *e){
     // Serial.println(code);
     if(code == LV_EVENT_CLICKED) {
         if (obj == btn1)
-        lv_label_set_text(label, "Hello");
-        else if (obj == btn2){
+          lv_label_set_text(label, "Hello");
+        else if (obj == btn2)
           lv_label_set_text(label, "Goodbye");
-        }
+        else if (obj == btn3)
+          lv_label_set_text(label, "مهدی");         
     }
 }
 #else
@@ -215,15 +217,17 @@ void setup() {
     static lv_style_t style;
     lv_style_init(&style);
 
-    lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_BLUE));
-    lv_style_set_border_width(&style, 5);
+    lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_AMBER));
+    lv_style_set_border_width(&style, 3);
     lv_style_set_border_opa(&style, LV_OPA_50);
     lv_style_set_border_side(&style, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT); //LV_BORDER_SIDE_FULL
 
   label = lv_label_create(screenMain);
   lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
   // lv_label_set_text(label, "سلام مهدی: this is start");
-  lv_label_set_text(label, "سلام مهدی1ودیگر2:thisوما2");
+  // lv_label_set_text(label, "سلام مهدی1ودیگر2:thisوما2");
+  // lv_label_set_text(label, "سللام مهدی1ودیگر 2 :this و ما2");
+  lv_label_set_text(label, "سلام مهدی 1 و دیگر :this is us وما 2");
   lv_obj_set_align(label,LV_TEXT_ALIGN_CENTER);
   lv_obj_set_style_base_dir(label, LV_BASE_DIR_AUTO, 0);
   lv_obj_set_size(label, 310, 40);
@@ -235,9 +239,11 @@ void setup() {
   lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
   lv_label_set_text(label, "Press a button");
   lv_obj_set_align(label,LV_TEXT_ALIGN_CENTER);
+  lv_obj_set_style_base_dir(label, LV_BASE_DIR_AUTO, 0);
+  lv_obj_set_style_text_font(label,&lv_font_dejavu_16_persian_hebrew,0 );
   lv_obj_set_size(label, 320, 40);
   lv_obj_set_pos(label, 0, 15);
-  lv_obj_set_style_text_font(label,&lv_font_montserrat_34,0 );
+  
 
   btn1 = lv_btn_create(screenMain);
   lv_obj_add_event_cb(btn1,event_handler_btn,LV_EVENT_ALL,NULL);
@@ -252,10 +258,25 @@ void setup() {
   lv_obj_add_event_cb(btn2,event_handler_btn,LV_EVENT_ALL,NULL);
   lv_obj_set_width(btn2, 70);
   lv_obj_set_height(btn2, 32);
-  lv_obj_set_pos(btn2, 142, 100);
+  lv_obj_set_pos(btn2, 132, 100);
 
   lv_obj_t * label2 = lv_label_create(btn2);
   lv_label_set_text(label2, "Goodbye");
+  lv_obj_set_align(label2,LV_TEXT_ALIGN_CENTER);
+
+
+  btn3 = lv_btn_create(screenMain);
+  lv_obj_add_event_cb(btn3,event_handler_btn,LV_EVENT_ALL,NULL);
+  lv_obj_set_width(btn3, 70);
+  lv_obj_set_height(btn3, 32);
+  lv_obj_set_pos(btn3, 232, 100);
+
+  lv_obj_t * label3 = lv_label_create(btn3);
+  lv_label_set_text(label3, "مهدی");
+  lv_obj_set_align(label3,LV_TEXT_ALIGN_CENTER);
+  lv_obj_set_style_base_dir(label3, LV_BASE_DIR_AUTO, 0);
+  lv_obj_set_style_text_font(label3,&lv_font_dejavu_16_persian_hebrew,0 );
+  
 
   #endif
   
