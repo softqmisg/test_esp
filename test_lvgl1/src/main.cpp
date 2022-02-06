@@ -3,6 +3,7 @@
 // #include "TouchScreen.h"
 #include "TFT_eSPI.h"
 #include "lvgl.h"
+// #define __ANIMATION_ENABLE__
 
 #define PIN_LEFT  21
 #define PIN_RIGHT  3
@@ -91,7 +92,7 @@ void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
   }
  data->key = last_btn;
 }
-
+#ifndef __ANIMATION_ENABLE__
 static void event_handler_btn( lv_event_t *e){
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *obj=lv_event_get_target(e);
@@ -104,6 +105,54 @@ static void event_handler_btn( lv_event_t *e){
         }
     }
 }
+#else
+static void anim_x_cb(void * var, int32_t v)
+{
+    lv_obj_set_x((_lv_obj_t *)var, (lv_coord_t)v);
+}
+
+static void sw_event_cb(lv_event_t * e)
+{
+    lv_obj_t * sw = lv_event_get_target(e);
+    lv_obj_t * label = (lv_obj_t *)lv_event_get_user_data(e);
+
+    if(lv_obj_has_state(sw, LV_STATE_CHECKED)) {
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, label);
+        lv_anim_set_values(&a, lv_obj_get_x(label), 100);
+        lv_anim_set_time(&a, 500);
+        lv_anim_set_exec_cb(&a, anim_x_cb);
+        lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
+        lv_anim_start(&a);
+    } else {
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, label);
+        lv_anim_set_values(&a, lv_obj_get_x(label), -lv_obj_get_width(label));
+        lv_anim_set_time(&a, 500);
+        lv_anim_set_exec_cb(&a, anim_x_cb);
+        lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
+        lv_anim_start(&a);
+    }
+
+}
+/**
+ * Start animation on an event
+ */
+void lv_example_anim_1(void)
+{
+    lv_obj_t * label = lv_label_create(screenMain);
+    lv_label_set_text(label, "Hello animations!");
+    lv_obj_set_pos(label, 100, 10);
+
+
+    lv_obj_t * sw = lv_switch_create(screenMain);
+    lv_obj_center(sw);
+    lv_obj_add_state(sw, LV_STATE_CHECKED);
+    lv_obj_add_event_cb(sw, sw_event_cb, LV_EVENT_VALUE_CHANGED, label);
+}
+#endif
 
 void setup() {
   // put your setup code here, to run once:
@@ -128,7 +177,6 @@ void setup() {
   disp_drv.flush_cb = my_disp_flush;
   disp_drv.draw_buf = &disp_buf;
   lv_disp_drv_register(&disp_drv);
-  
     /*Initialize the input device driver*/
   
   // lv_indev_drv_init(&indev_drv);
@@ -152,8 +200,9 @@ void setup() {
   /*Create screen objects*/
 
   screenMain = lv_obj_create(NULL);
-
-
+  #ifdef __ANIMATION_ENABLE__
+  lv_example_anim_1();
+  #else
   label=lv_label_create(screenMain);
   lv_label_set_recolor(label,true);
   lv_label_set_text(label,  LV_SYMBOL_OK "#00ff00 Apply #" "#0000ff \xef\x87\xab #" "#ff0000 \xef\x8a\x93 #");  //LV_SYMBOL_SD_CARD LV_SYMBOL_BLUETOOTH LV_SYMBOL_BATTERY_EMPTY);
@@ -169,14 +218,15 @@ void setup() {
     lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_border_width(&style, 5);
     lv_style_set_border_opa(&style, LV_OPA_50);
-    lv_style_set_border_side(&style, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
+    lv_style_set_border_side(&style, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT); //LV_BORDER_SIDE_FULL
 
   label = lv_label_create(screenMain);
   lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-  lv_label_set_text(label, "سلام مهدی: this is start");
+  // lv_label_set_text(label, "سلام مهدی: this is start");
+  lv_label_set_text(label, "سلام مهدی1ودیگر2:thisوما2");
   lv_obj_set_align(label,LV_TEXT_ALIGN_CENTER);
   lv_obj_set_style_base_dir(label, LV_BASE_DIR_AUTO, 0);
-  lv_obj_set_size(label, 240, 40);
+  lv_obj_set_size(label, 310, 40);
   lv_obj_set_pos(label, 0, 180);
   lv_obj_set_style_text_font(label, &lv_font_dejavu_16_persian_hebrew, 0);
   lv_obj_add_style(label, &style, 0);
@@ -207,7 +257,7 @@ void setup() {
   lv_obj_t * label2 = lv_label_create(btn2);
   lv_label_set_text(label2, "Goodbye");
 
-
+  #endif
   
   lv_scr_load(screenMain);  
 }
