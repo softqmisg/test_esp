@@ -140,6 +140,8 @@ void setup() {
   demo3_create();
 #elif LV_USE_DEMO4
   demo4_create();
+#elif LV_USE_DEMO5
+  demo5_create();
 #endif
   
   lv_scr_load(lv_scr_act());  
