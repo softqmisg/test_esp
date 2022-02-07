@@ -16,7 +16,6 @@
 // const lv_point_t points_array[]={{32,100},{142,100}};
 
 // TouchScreen ts = TouchScreen(XP, YP, XM, YM, 340);
-
 // TSPoint oldPoint;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf[TFT_WIDTH * 10];
