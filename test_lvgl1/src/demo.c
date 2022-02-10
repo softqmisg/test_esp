@@ -1,6 +1,190 @@
 #include <Arduino.h>
 #include "demo.h"
 extern lv_indev_t *my_indev;
+#if LV_USE_DEMO_TEST
+void  demo_test_create(){
+    lv_group_t * g = lv_group_create();
+    lv_group_set_default(g);
+    lv_indev_set_group(my_indev,g); 
+    
+    lv_obj_t *label=lv_label_create(lv_scr_act());
+    lv_label_set_text(label,"test");
+    lv_obj_set_pos(label,100,100);
+    lv_group_add_obj(g,label);
+
+    label=lv_label_create(lv_scr_act());
+    lv_label_set_text(label,"test1");
+    lv_obj_set_pos(label,100,120);
+    lv_group_add_obj(g,label);
+
+    lv_obj_t *text1=lv_textarea_create(lv_scr_act());
+    lv_textarea_set_text(text1,LV_SYMBOL_GPS " test2");
+    lv_textarea_set_one_line(text1,true);
+    lv_textarea_set_cursor_click_pos(text1,false);
+    lv_obj_set_pos(text1,100,150);
+    lv_group_add_obj(g,text1);
+
+    text1=lv_textarea_create(lv_scr_act());
+    lv_textarea_set_text(text1,"test3");
+    lv_textarea_set_one_line(text1,true);
+    lv_textarea_set_cursor_click_pos(text1,false);
+    lv_obj_set_pos(text1,100,180);
+    lv_group_add_obj(g,text1);
+
+}
+#endif
+#if LV_USE_DEMO6
+static void start_btn_event(lv_event_t *e)
+{
+    lv_obj_t *menu=lv_obj_get_parent(lv_event_get_target(e));
+    lv_obj_t *side=lv_event_get_user_data(e);
+    lv_menu_set_page(menu, NULL);
+    // lv_menu_clear_history(menu);
+    lv_menu_set_sidebar_page(menu,side);
+}
+static void anim_width_cb(void *var,int32_t v)
+{
+    lv_obj_set_width(var,v);
+}
+void  demo6_create(){
+    lv_group_t * g = lv_group_create();
+    lv_group_set_default(g);
+    lv_indev_set_group(my_indev,g); 
+
+    lv_obj_t *menu=lv_menu_create(lv_scr_act());
+    lv_color_t bg_color = lv_obj_get_style_bg_color(menu, 0);
+    if(lv_color_brightness(bg_color) > 127) {
+        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 10), 0);
+    }else{
+        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 50), 0);
+    }
+    lv_menu_set_mode_root_back_btn(menu,LV_MENU_ROOT_BACK_BTN_ENABLED);
+    lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+    lv_obj_center(menu);
+
+   static  lv_style_t btn_focuestyle;
+    lv_style_init(&btn_focuestyle);
+    lv_style_set_radius(&btn_focuestyle, 3);
+    lv_style_set_bg_opa(&btn_focuestyle, LV_OPA_100);
+    lv_style_set_bg_color(&btn_focuestyle, lv_palette_lighten(LV_PALETTE_LIGHT_BLUE,4));
+    lv_style_set_outline_width(&btn_focuestyle, 1);
+    lv_style_set_outline_color(&btn_focuestyle, lv_palette_lighten(LV_PALETTE_LIGHT_BLUE,4));
+    lv_style_set_pad_all(&btn_focuestyle, 0);
+    lv_style_set_text_color(&btn_focuestyle, lv_palette_darken(LV_PALETTE_LIGHT_BLUE,1));
+    // lv_style_set_pad_hor(&btn_focuestyle, 0);
+
+    
+   static  lv_style_t btn_pressed;
+    lv_style_init(&btn_pressed);
+    lv_style_set_radius(&btn_pressed, 3);
+    lv_style_set_bg_opa(&btn_pressed, LV_OPA_100);
+    lv_style_set_bg_color(&btn_pressed, lv_palette_lighten(LV_PALETTE_GREY,3));
+    lv_style_set_outline_width(&btn_pressed, 1);
+    lv_style_set_outline_color(&btn_pressed, lv_palette_lighten(LV_PALETTE_GREY,3));
+    lv_style_set_pad_all(&btn_focuestyle, 0);
+    lv_style_set_text_color(&btn_pressed, lv_color_hex(0x0));
+    // lv_style_set_pad_hor(&btn_pressed, 0);
+
+
+    lv_obj_t *main_page=lv_menu_page_create(menu,NULL);
+    lv_obj_set_style_pad_hor(main_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
+        lv_obj_t *section1=lv_menu_section_create(main_page);
+            lv_obj_t *con=lv_menu_cont_create(section1);
+                lv_obj_set_style_pad_all(con, 0,0);
+                lv_obj_t *btn_l=lv_btn_create(con);  
+                lv_obj_remove_style_all(btn_l);
+                lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
+                lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
+                lv_obj_set_width(btn_l,lv_obj_get_style_width(section1,0));
+                lv_group_add_obj(g,btn_l);    
+                        con=lv_menu_cont_create(btn_l);
+                        // lv_obj_set_style_pad_all(con, 0,0);
+                            lv_obj_t *img =lv_img_create(con);
+                            lv_img_set_src(img,LV_SYMBOL_HOME);   
+                            lv_obj_set_style_pad_right(img,1,1);
+                            lv_obj_t *label = lv_label_create(con);
+                            lv_label_set_text(label, " Home");
+                            lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                            lv_obj_set_flex_grow(label, 1);
+
+            con=lv_menu_cont_create(section1);
+            lv_obj_set_style_pad_all(con, 0,0);
+                btn_l=lv_btn_create(con);  
+                lv_obj_remove_style_all(btn_l);
+                lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
+                lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
+                lv_obj_set_width(btn_l,lv_obj_get_style_width(section1,0));
+                lv_group_add_obj(g,btn_l);  
+                    con=lv_menu_cont_create(btn_l);
+                        img =lv_img_create(con);
+                        lv_img_set_src(img,LV_SYMBOL_WIFI);
+                        label = lv_label_create(con);
+                        lv_label_set_text(label, "WIFI");
+                        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                        lv_obj_set_flex_grow(label, 1);
+                // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+
+    //         con=lv_menu_cont_create(section1);
+    //             btn_l=lv_btn_create(con);  
+    //             label = lv_label_create(btn_l);
+    //             lv_label_set_text(label, LV_SYMBOL_GPS" GPS");
+    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    //             lv_obj_set_flex_grow(label, 1);
+    //             lv_group_add_obj(g,btn_l);    
+    //             // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+
+            con=lv_menu_cont_create(main_page);
+                label = lv_label_create(con);
+                lv_label_set_text(label, "Others");
+                lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                lv_obj_set_flex_grow(label, 1);
+
+        lv_obj_t *section2=lv_menu_section_create(main_page);
+            con=lv_menu_cont_create(section2);
+                btn_l=lv_btn_create(con);  
+    //             label = lv_label_create(btn_l);
+    //             lv_label_set_text(label, LV_SYMBOL_BLUETOOTH" Bluetooth");
+    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    //             lv_obj_set_flex_grow(label, 1);
+    //             lv_group_add_obj(g,btn_l);    
+    //         // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+
+    //         con=lv_menu_cont_create(section2);
+    //             btn_l=lv_btn_create(con);  
+    //             label = lv_label_create(btn_l);
+    //             lv_label_set_text(label, LV_SYMBOL_KEYBOARD" KEYBOARD");
+    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    //             lv_obj_set_flex_grow(label, 1);
+    //             lv_group_add_obj(g,btn_l);    
+    //             // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+    lv_menu_set_sidebar_page(menu,main_page);
+    lv_obj_t *btn_back_label=lv_label_create(((lv_menu_t *)menu)->sidebar_header_back_btn);
+    lv_label_set_long_mode(btn_back_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_flex_grow(btn_back_label, 1);
+    lv_label_set_text(btn_back_label,"Backcccccc"); 
+    
+    // lv_obj_t *start_btn=lv_btn_create(menu);
+    // label=lv_label_create(start_btn);
+    // lv_label_set_text(label,"start");
+    // lv_obj_add_event_cb(start_btn,start_btn_event,LV_EVENT_CLICKED,main_page);
+    
+
+    LV_LOG_USER("starting demo\n");
+    
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, main_page);
+    lv_anim_set_values(&a, 0, 90);
+    LV_LOG_USER("width:%d,%d",(int)lv_obj_get_width(lv_menu_get_main_header(menu))
+                            ,lv_obj_get_width(main_page));
+    lv_anim_set_time(&a, 500);
+    lv_anim_set_exec_cb(&a, anim_width_cb);
+    lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
+    lv_anim_start(&a);
+
+
+}
+#endif
 #if LV_USE_DEMO5
 
 enum {
@@ -443,11 +627,15 @@ static void sw_event_cb(lv_event_t * e)
     }
 
 }
-/**
- * Start animation on an event
- */
-void lv_example_anim_1(void)
+
+void demo2_create()
 {
+lv_group_t * g = lv_group_create();
+  lv_group_set_default(g);
+  lv_indev_set_group(my_indev,g);
+  /*Create screen objects*/
+  lv_obj_t *screenMain = lv_scr_act();
+
     lv_obj_t * label = lv_label_create(screenMain);
     lv_label_set_text(label, "Hello animations!");
     lv_obj_set_pos(label, 100, 10);
@@ -457,16 +645,5 @@ void lv_example_anim_1(void)
     lv_obj_center(sw);
     lv_obj_add_state(sw, LV_STATE_CHECKED);
     lv_obj_add_event_cb(sw, sw_event_cb, LV_EVENT_VALUE_CHANGED, label);
-}
-void demo2_create()
-{
-lv_group_t * g = lv_group_create();
-  lv_group_set_default(g);
-  lv_indev_set_group(my_indev,g);
-  /*Create screen objects*/
-  lv_obj_t *screenMain = lv_scr_act();
-
-    lv_example_anim_1();
-
 }
 #endif

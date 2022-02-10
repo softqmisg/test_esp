@@ -59,11 +59,23 @@ int my_keys_read(void)
 {
   int ID=-1;//LV_KEY_ENTER; LV_KEY_RIGHT ;//LV_KEY_LEFT
   if(!digitalRead(PIN_LEFT))
-    ID=LV_KEY_LEFT;
+  {
+    delay(10);
+    if(!digitalRead(PIN_LEFT))
+      ID=LV_KEY_LEFT;
+  }
   if(!digitalRead(PIN_RIGHT))
-    ID=LV_KEY_RIGHT;
+  {
+    delay(10);
+    if(!digitalRead(PIN_RIGHT))
+      ID=LV_KEY_RIGHT;
+  }
   if(!digitalRead(PIN_ENTER))
-    ID=LV_KEY_ENTER;
+  {
+    delay(10);
+    if(!digitalRead(PIN_ENTER))
+      ID=LV_KEY_ENTER;
+  }
     
   return ID;
 }
@@ -96,7 +108,7 @@ void setup() {
    pinMode(PIN_ENTER,INPUT_PULLUP);
    ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BL_PIN, 0);
-  ledcWrite(0, 30);
+  ledcWrite(0, 4*255/10);
   tft.begin();
   tft.setRotation(3);
   // analogReadResolution(10);
@@ -131,8 +143,9 @@ void setup() {
   // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
   // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
   // https://docs.lvgl.io/latest/en/html/porting/indev.html
-  
-#if LV_USE_DEMO1
+#if LV_USE_DEMO_TEST
+  demo_test_create();
+#elif LV_USE_DEMO1
    demo1_create();
 #elif LV_USE_DEMO2
   demo2_create();
@@ -142,6 +155,8 @@ void setup() {
   demo4_create();
 #elif LV_USE_DEMO5
   demo5_create();
+#elif LV_USE_DEMO6
+  demo6_create();
 #endif
   
   lv_scr_load(lv_scr_act());  
