@@ -34,18 +34,53 @@ void  demo_test_create(){
 }
 #endif
 #if LV_USE_DEMO6
-static void start_btn_event(lv_event_t *e)
+static void back_event_handler(lv_event_t * e)
 {
-    lv_obj_t *menu=lv_obj_get_parent(lv_event_get_target(e));
-    lv_obj_t *side=lv_event_get_user_data(e);
-    lv_menu_set_page(menu, NULL);
-    // lv_menu_clear_history(menu);
-    lv_menu_set_sidebar_page(menu,side);
+    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * menu = lv_event_get_user_data(e);
+    lv_menu_set_sidebar_page(menu,NULL);
+    lv_menu_set_mode_root_back_btn(menu,LV_MENU_ROOT_BACK_BTN_DISABLED);
+
+    if(lv_menu_back_btn_is_root(menu, obj)) {
+        lv_obj_t * mbox1 = lv_msgbox_create(NULL, "سلام", "Root back btn click.", NULL, true);
+        lv_obj_center(mbox1);
+    }
+
+
+
 }
 static void anim_width_cb(void *var,int32_t v)
 {
     lv_obj_set_width(var,v);
 }
+static void start_btn_event(lv_event_t *e)
+{
+    lv_obj_t *menu=lv_obj_get_parent(lv_event_get_target(e));
+    lv_obj_t *side=lv_event_get_user_data(e);
+    lv_menu_set_mode_root_back_btn(menu,LV_MENU_ROOT_BACK_BTN_ENABLED);
+
+    lv_menu_set_page(menu, NULL);
+    lv_menu_set_sidebar_page(menu,NULL);
+    lv_menu_clear_history(menu);
+    lv_menu_set_sidebar_page(menu,side);
+    lv_obj_set_width(((lv_menu_t *)menu)->sidebar,110);
+    lv_obj_set_width(((lv_menu_t *)menu)->sidebar_header_back_btn,lv_obj_get_style_width(side,0));
+
+    lv_obj_t *btn_back_label=lv_label_create(((lv_menu_t *)menu)->sidebar_header_back_btn);
+    lv_label_set_long_mode(btn_back_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_flex_grow(btn_back_label, 1);
+    lv_label_set_text(btn_back_label,"بازگشت"); 
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, ((lv_menu_t *)menu)->sidebar);
+    lv_anim_set_values(&a, 0, lv_obj_get_style_width(((lv_menu_t *)menu)->sidebar,0));
+    lv_anim_set_time(&a, 1300);
+    lv_anim_set_exec_cb(&a, anim_width_cb);
+    lv_anim_set_path_cb(&a, lv_anim_path_linear);
+    lv_anim_start(&a);
+}
+
 void  demo6_create(){
     lv_group_t * g = lv_group_create();
     lv_group_set_default(g);
@@ -58,9 +93,11 @@ void  demo6_create(){
     }else{
         lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 50), 0);
     }
-    lv_menu_set_mode_root_back_btn(menu,LV_MENU_ROOT_BACK_BTN_ENABLED);
+    lv_menu_set_mode_root_back_btn(menu,LV_MENU_ROOT_BACK_BTN_DISABLED);
+    lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
+
 
    static  lv_style_t btn_focuestyle;
     lv_style_init(&btn_focuestyle);
@@ -100,7 +137,7 @@ void  demo6_create(){
                         lv_img_set_src(img,LV_SYMBOL_HOME);   
                         lv_obj_set_style_pad_right(img,1,1);
                         lv_obj_t *label = lv_label_create(con);
-                        lv_label_set_text(label, " Home");
+                        lv_label_set_text(label, "خانه");
                         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
                         lv_obj_set_flex_grow(label, 1);
 
@@ -174,35 +211,19 @@ void  demo6_create(){
                         lv_label_set_text(label, "KEYBOARD");
                         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
                         lv_obj_set_flex_grow(label, 1);
-
-    lv_menu_set_sidebar_page(menu,main_page);
-    lv_obj_set_width(((lv_menu_t *)menu)->sidebar_header_back_btn,lv_obj_get_style_width(section1,0));
-    lv_obj_t *btn_back_label=lv_label_create(((lv_menu_t *)menu)->sidebar_header_back_btn);
-    lv_label_set_long_mode(btn_back_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_flex_grow(btn_back_label, 1);
-    lv_label_set_text(btn_back_label,"Backcccccc"); 
-
     
-    
-    // lv_obj_t *start_btn=lv_btn_create(menu);
-    // label=lv_label_create(start_btn);
-    // lv_label_set_text(label,"start");
-    // lv_obj_add_event_cb(start_btn,start_btn_event,LV_EVENT_CLICKED,main_page);
+    lv_menu_set_sidebar_page(menu,NULL);
+   
+    lv_obj_t *start_btn=lv_btn_create(menu);
+    label=lv_label_create(start_btn);
+    lv_label_set_text(label,"منو");
+    lv_obj_add_event_cb(start_btn,start_btn_event,LV_EVENT_CLICKED,main_page);
     
 
-    LV_LOG_USER("starting demo\n");
+    LV_LOG_INFO("starting demo\n");
     
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_var(&a, ((lv_menu_t *)menu)->sidebar);
 
-    lv_anim_set_values(&a, 0, 90);
-    LV_LOG_USER("width:%d,%d",(int)lv_obj_get_width(lv_menu_get_main_header(menu))
-                            ,lv_obj_get_style_width(((lv_menu_t *)menu)->sidebar,0));
-    lv_anim_set_time(&a, 300);
-    lv_anim_set_exec_cb(&a, anim_width_cb);
-    lv_anim_set_path_cb(&a, lv_anim_path_linear);
-    lv_anim_start(&a);
+
 }
 #endif
 #if LV_USE_DEMO5
