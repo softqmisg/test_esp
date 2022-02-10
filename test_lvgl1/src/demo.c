@@ -71,7 +71,6 @@ void  demo6_create(){
     lv_style_set_outline_color(&btn_focuestyle, lv_palette_lighten(LV_PALETTE_LIGHT_BLUE,4));
     lv_style_set_pad_all(&btn_focuestyle, 0);
     lv_style_set_text_color(&btn_focuestyle, lv_palette_darken(LV_PALETTE_LIGHT_BLUE,1));
-    // lv_style_set_pad_hor(&btn_focuestyle, 0);
 
     
    static  lv_style_t btn_pressed;
@@ -83,29 +82,27 @@ void  demo6_create(){
     lv_style_set_outline_color(&btn_pressed, lv_palette_lighten(LV_PALETTE_GREY,3));
     lv_style_set_pad_all(&btn_focuestyle, 0);
     lv_style_set_text_color(&btn_pressed, lv_color_hex(0x0));
-    // lv_style_set_pad_hor(&btn_pressed, 0);
 
 
     lv_obj_t *main_page=lv_menu_page_create(menu,NULL);
     lv_obj_set_style_pad_hor(main_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
         lv_obj_t *section1=lv_menu_section_create(main_page);
             lv_obj_t *con=lv_menu_cont_create(section1);
-                lv_obj_set_style_pad_all(con, 0,0);
+            lv_obj_set_style_pad_all(con, 0,0);
                 lv_obj_t *btn_l=lv_btn_create(con);  
                 lv_obj_remove_style_all(btn_l);
                 lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
                 lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
                 lv_obj_set_width(btn_l,lv_obj_get_style_width(section1,0));
                 lv_group_add_obj(g,btn_l);    
-                        con=lv_menu_cont_create(btn_l);
-                        // lv_obj_set_style_pad_all(con, 0,0);
-                            lv_obj_t *img =lv_img_create(con);
-                            lv_img_set_src(img,LV_SYMBOL_HOME);   
-                            lv_obj_set_style_pad_right(img,1,1);
-                            lv_obj_t *label = lv_label_create(con);
-                            lv_label_set_text(label, " Home");
-                            lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-                            lv_obj_set_flex_grow(label, 1);
+                    con=lv_menu_cont_create(btn_l);
+                        lv_obj_t *img =lv_img_create(con);
+                        lv_img_set_src(img,LV_SYMBOL_HOME);   
+                        lv_obj_set_style_pad_right(img,1,1);
+                        lv_obj_t *label = lv_label_create(con);
+                        lv_label_set_text(label, " Home");
+                        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                        lv_obj_set_flex_grow(label, 1);
 
             con=lv_menu_cont_create(section1);
             lv_obj_set_style_pad_all(con, 0,0);
@@ -122,46 +119,70 @@ void  demo6_create(){
                         lv_label_set_text(label, "WIFI");
                         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
                         lv_obj_set_flex_grow(label, 1);
-                // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
 
-    //         con=lv_menu_cont_create(section1);
-    //             btn_l=lv_btn_create(con);  
-    //             label = lv_label_create(btn_l);
-    //             lv_label_set_text(label, LV_SYMBOL_GPS" GPS");
-    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    //             lv_obj_set_flex_grow(label, 1);
-    //             lv_group_add_obj(g,btn_l);    
-    //             // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+            con=lv_menu_cont_create(section1);
+            lv_obj_set_style_pad_all(con, 0,0);
+                btn_l=lv_btn_create(con);  
+                lv_obj_remove_style_all(btn_l);
+                lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
+                lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
+                lv_obj_set_width(btn_l,lv_obj_get_style_width(section1,0));
+                lv_group_add_obj(g,btn_l);  
+                    con=lv_menu_cont_create(btn_l);
+                        img =lv_img_create(con);
+                        lv_img_set_src(img,LV_SYMBOL_GPS);
+                        label = lv_label_create(con);
+                        lv_label_set_text(label, "GPS");
+                        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                        lv_obj_set_flex_grow(label, 1);
 
-            con=lv_menu_cont_create(main_page);
-                label = lv_label_create(con);
-                lv_label_set_text(label, "Others");
-                lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-                lv_obj_set_flex_grow(label, 1);
+        con=lv_menu_cont_create(main_page);
+            label = lv_label_create(con);
+            lv_label_set_text(label, "Others");
+            lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+            lv_obj_set_flex_grow(label, 1);
 
         lv_obj_t *section2=lv_menu_section_create(main_page);
             con=lv_menu_cont_create(section2);
+            lv_obj_set_style_pad_all(con, 0,0);
                 btn_l=lv_btn_create(con);  
-    //             label = lv_label_create(btn_l);
-    //             lv_label_set_text(label, LV_SYMBOL_BLUETOOTH" Bluetooth");
-    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    //             lv_obj_set_flex_grow(label, 1);
-    //             lv_group_add_obj(g,btn_l);    
-    //         // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+                lv_obj_remove_style_all(btn_l);
+                lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
+                lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
+                lv_obj_set_width(btn_l,lv_obj_get_style_width(section2,0));
+                lv_group_add_obj(g,btn_l);  
+                    con=lv_menu_cont_create(btn_l);
+                        img =lv_img_create(con);
+                        lv_img_set_src(img,LV_SYMBOL_BLUETOOTH);
+                        label = lv_label_create(con);
+                        lv_label_set_text(label, "BLUETOOTH");
+                        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                        lv_obj_set_flex_grow(label, 1);
 
-    //         con=lv_menu_cont_create(section2);
-    //             btn_l=lv_btn_create(con);  
-    //             label = lv_label_create(btn_l);
-    //             lv_label_set_text(label, LV_SYMBOL_KEYBOARD" KEYBOARD");
-    //             lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    //             lv_obj_set_flex_grow(label, 1);
-    //             lv_group_add_obj(g,btn_l);    
-    //             // lv_obj_add_event_cb(con, main_page_event, LV_EVENT_ALL, 0);
+            con=lv_menu_cont_create(section2);
+            lv_obj_set_style_pad_all(con, 0,0);
+                btn_l=lv_btn_create(con);  
+                lv_obj_remove_style_all(btn_l);
+                lv_obj_add_style(btn_l,&btn_focuestyle,LV_STATE_FOCUSED);
+                lv_obj_add_style(btn_l,&btn_pressed,LV_STATE_PRESSED);
+                lv_obj_set_width(btn_l,lv_obj_get_style_width(section2,0));
+                lv_group_add_obj(g,btn_l);  
+                    con=lv_menu_cont_create(btn_l);
+                        img =lv_img_create(con);
+                        lv_img_set_src(img,LV_SYMBOL_KEYBOARD);
+                        label = lv_label_create(con);
+                        lv_label_set_text(label, "KEYBOARD");
+                        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+                        lv_obj_set_flex_grow(label, 1);
+
     lv_menu_set_sidebar_page(menu,main_page);
+    lv_obj_set_width(((lv_menu_t *)menu)->sidebar_header_back_btn,lv_obj_get_style_width(section1,0));
     lv_obj_t *btn_back_label=lv_label_create(((lv_menu_t *)menu)->sidebar_header_back_btn);
     lv_label_set_long_mode(btn_back_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_flex_grow(btn_back_label, 1);
     lv_label_set_text(btn_back_label,"Backcccccc"); 
+
+    
     
     // lv_obj_t *start_btn=lv_btn_create(menu);
     // label=lv_label_create(start_btn);
@@ -173,16 +194,15 @@ void  demo6_create(){
     
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_var(&a, main_page);
+    lv_anim_set_var(&a, ((lv_menu_t *)menu)->sidebar);
+
     lv_anim_set_values(&a, 0, 90);
     LV_LOG_USER("width:%d,%d",(int)lv_obj_get_width(lv_menu_get_main_header(menu))
-                            ,lv_obj_get_width(main_page));
-    lv_anim_set_time(&a, 500);
+                            ,lv_obj_get_style_width(((lv_menu_t *)menu)->sidebar,0));
+    lv_anim_set_time(&a, 300);
     lv_anim_set_exec_cb(&a, anim_width_cb);
-    lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
+    lv_anim_set_path_cb(&a, lv_anim_path_linear);
     lv_anim_start(&a);
-
-
 }
 #endif
 #if LV_USE_DEMO5
