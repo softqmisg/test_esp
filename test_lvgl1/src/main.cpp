@@ -3,7 +3,9 @@
 // #include "TouchScreen.h"
 #include "TFT_eSPI.h"
 #include "demo.h"
-
+#if LV_USE_DEMO6
+extern  lv_obj_t *switch_menu;
+#endif
 #define TFT_BL_PIN  2
 // #define YP 26
 // #define XM 25
@@ -62,13 +64,13 @@ int my_keys_read(void)
   {
     delay(10);
     if(!digitalRead(PIN_LEFT))
-      ID=LV_KEY_LEFT;
+      ID=LV_KEY_PREV;
   }
   if(!digitalRead(PIN_RIGHT))
   {
     delay(10);
     if(!digitalRead(PIN_RIGHT))
-      ID=LV_KEY_RIGHT;
+      ID=LV_KEY_NEXT;
   }
   if(!digitalRead(PIN_ENTER))
   {
@@ -76,7 +78,15 @@ int my_keys_read(void)
     if(!digitalRead(PIN_ENTER))
       ID=LV_KEY_ENTER;
   }
-    
+
+  if(!digitalRead(PIN_MENU))
+  {
+    delay(10);
+    if(!digitalRead(PIN_MENU))
+    {
+      ID='m';
+    }
+  }    
   return ID;
 }
 
@@ -88,12 +98,33 @@ void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
     last_btn = key_pr;            /*Get the last pressed or released key*/
                                      
     data->state = LV_INDEV_STATE_PR;
+  #if LV_USE_DEMO6
+    if(key_pr=='m')
+    {
+        if(lv_obj_has_state(switch_menu,LV_STATE_CHECKED))
+        {
+            LV_LOG_USER("M pressed clear\n\r");
+
+            lv_obj_clear_state(switch_menu,LV_STATE_CHECKED);
+        }
+        else
+        {
+            LV_LOG_USER("M pressed add\n\r");
+
+            lv_obj_add_state(switch_menu,LV_STATE_CHECKED);
+        }
+        lv_event_send(switch_menu,LV_EVENT_PRESSED,NULL);
+    }
+  #endif    
   }
   else
   {
     data->state = LV_INDEV_STATE_REL;
   }
  data->key = last_btn;
+
+
+
 }
 
 static void my_log(const char *buf)
@@ -102,11 +133,40 @@ static void my_log(const char *buf)
 }
 void setup() {
   // put your setup code here, to run once:
-   Serial.begin(9600);
+   Serial.begin(115200);
    pinMode(PIN_LEFT,INPUT_PULLUP);
    pinMode(PIN_RIGHT,INPUT_PULLUP);
    pinMode(PIN_ENTER,INPUT_PULLUP);
-   ledcSetup(0, 5000, 8);
+   pinMode(PIN_MENU,INPUT_PULLUP);
+  Serial.println("Starting =====>");
+  Serial.println("CpuFrequencyMhz:"+String(getCpuFrequencyMhz()));
+  Serial.println("XtalFrequencyMhz:"+String(getXtalFrequencyMhz()));
+  Serial.println("ApbFrequency:"+String(getApbFrequency()));
+  Serial.println("getChipCores:"+String(ESP.getChipCores()));
+  Serial.println("getChipModel:"+String(ESP.getChipModel()));
+  Serial.println("getCpuFreqMHz:"+String(ESP.getCpuFreqMHz()));
+  Serial.println("getCycleCount:"+String(ESP.getCycleCount()));
+  uint64_t number=ESP.getEfuseMac();
+  unsigned long long1 = (unsigned long)((number & 0xFFFF0000) >> 16 );
+  unsigned long long2 = (unsigned long)((number & 0x0000FFFF));
+  String hex = String(long1, HEX) + String(long2, HEX); // six octets
+  Serial.println("getEfuseMac:"+hex);
+  Serial.println("getFlashChipMode:"+String(ESP.getFlashChipMode()));
+  Serial.println("getFlashChipSize:"+String(ESP.getFlashChipSize()));
+  Serial.println("getFreeHeap:"+String(ESP.getFreeHeap()));
+  Serial.println("getFreePsram:"+String(ESP.getFreePsram()));
+  Serial.println("getFreeSketchSpace:"+String(ESP.getFreeSketchSpace()));
+  Serial.println("getHeapSize:"+String(ESP.getHeapSize()));
+  Serial.println("getMaxAllocHeap:"+String(ESP.getMaxAllocHeap()));
+  Serial.println("getMaxAllocPsram:"+String(ESP.getMaxAllocPsram()));
+  Serial.println("getMinFreeHeap:"+String(ESP.getMinFreeHeap()));
+  Serial.println("getMinFreePsram:"+String(ESP.getMinFreePsram()));
+  Serial.println("getPsramSize:"+String(ESP.getPsramSize()));
+  Serial.println("getSdkVersion:"+String(ESP.getSdkVersion()));
+  Serial.println("getSketchMD5:"+String(ESP.getSketchMD5()));
+  Serial.println("getSketchSize:"+String(ESP.getSketchSize()));
+
+  ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BL_PIN, 0);
   ledcWrite(0, 4*255/10);
   tft.begin();
@@ -136,7 +196,7 @@ void setup() {
   // lv_indev_drv_register(&indev_drv);
 
   lv_indev_drv_init(&indev_drv_button);
-  indev_drv_button.type=LV_INDEV_TYPE_ENCODER;
+  indev_drv_button.type=LV_INDEV_TYPE_KEYPAD;
   indev_drv_button.read_cb=encoder_with_keys_read;
   my_indev= lv_indev_drv_register(&indev_drv_button);
   
@@ -157,6 +217,12 @@ void setup() {
   demo5_create();
 #elif LV_USE_DEMO6
   demo6_create();
+#elif LV_USE_DEMO7
+  demo7_create();
+#elif LV_USE_DEMO8
+  demo8_create();
+#elif LV_USE_DEMO9
+  demo9_create();
 #endif
   
   lv_scr_load(lv_scr_act());  
