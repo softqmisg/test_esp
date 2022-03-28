@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <time.h>
 #include "demo.h"
-extern lv_indev_t *my_indev_button_enc;
 
+extern lv_indev_t *my_indev_button_enc;
 
 #if LV_USE_DEMO_TEST
 lv_obj_t* switch_menu;
@@ -27,6 +27,10 @@ static void btn_handler(lv_obj_t *e)
         lv_obj_add_state(switch_menu,LV_STATE_CHECKED);
         lv_event_send(switch_menu,LV_EVENT_CLICKED,0);
 }
+static void lv_spinbox_cb(lv_obj_t *e)
+{
+    
+}
 void  demo_test_create(){
 
 
@@ -36,16 +40,43 @@ void  demo_test_create(){
     lv_indev_set_group(my_indev_button_enc,g); 
 
     lv_obj_t *label=lv_label_create(lv_scr_act());
-    lv_obj_set_pos(label,100,0);
+    lv_obj_set_pos(label,10,0);
     switch_menu = lv_switch_create(lv_scr_act());
     lv_obj_add_event_cb(switch_menu,switch_menu_handler,LV_EVENT_CLICKED,label);
-    lv_obj_set_pos(switch_menu,100,50);
+    lv_obj_set_pos(switch_menu,10,50);
 
     lv_obj_t *btn=lv_btn_create(lv_scr_act());
-      lv_obj_set_pos(btn,100,100);
+    lv_obj_set_pos(btn,10,100);
     lv_obj_add_event_cb(btn,btn_handler,LV_EVENT_CLICKED,0);
     lv_obj_t *lbl_btn=lv_label_create(btn);
     lv_label_set_text(lbl_btn,"press");
+
+    lv_obj_t *spinbox=lv_spinbox_create(lv_scr_act());
+    lv_obj_set_pos(spinbox,10,150);
+    lv_spinbox_set_range(spinbox, -1000, 3000);
+    lv_spinbox_set_digit_format(spinbox, 4, 3);    
+    lv_spinbox_step_prev(spinbox);
+    lv_obj_set_width(spinbox, 100);
+    // lv_obj_center(spinbox);   
+    lv_obj_add_event_cb(spinbox,lv_spinbox_cb,LV_EVENT_CLICKED,NULL);
+
+    lv_obj_t * dd = lv_dropdown_create(lv_scr_act());
+    lv_obj_set_pos(dd,200,50);
+
+    lv_dropdown_set_options(dd, "Apple\n"
+                            "Banana\n"
+                            "Orange\n"
+                            "Cherry\n"
+                            "Grape\n"
+                            "Raspberry\n"
+                            "Melon\n"
+                            "Orange\n"
+                            "Lemon\n"
+                            "Nuts");
+
+    lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
+
+
 }
 #endif
 #if LV_USE_DEMO9

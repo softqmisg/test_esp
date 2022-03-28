@@ -13,7 +13,7 @@ extern  lv_obj_t *switch_menu;
 #define ROTARY_ENCODER_B_PIN 35 //dat
 #define ROTARY_ENCODER_BUTTON_PIN 4
 #define ROTARY_ENCODER_VCC_PIN -1 
-#define ROTARY_ENCODER_STEPS 2
+#define ROTARY_ENCODER_STEPS 4
 AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
 
 
@@ -111,9 +111,12 @@ int32_t get_encoder_move(void)
   static int32_t last_diff=0;
   int32_t cur_diff=rotaryEncoder.readEncoder();
   int32_t diff=cur_diff-last_diff;
+  if(diff>2)
+    diff=8-diff;
+  if(diff<-2)
+    diff=10+diff;
+
   last_diff=cur_diff;
-  if(last_diff==1000) last_diff=-1;
-  if(last_diff==0)  last_diff=1001;
 
   return diff;
 }
@@ -149,7 +152,7 @@ void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
     if(rotaryEncoder.encoderChanged())
     {
       data->enc_diff=get_encoder_move();
-      last_btn = data->enc_diff < 0 ? LV_KEY_LEFT : LV_KEY_RIGHT;      
+     // last_btn = data->enc_diff < 0 ? LV_KEY_RIGHT : LV_KEY_LEFT;      
     }
   }
  data->key = last_btn;
@@ -226,13 +229,16 @@ void setup() {
 
 	rotaryEncoder.begin();
 	rotaryEncoder.setup(readEncoderISR);
-	rotaryEncoder.setBoundaries(0, 1000, true); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
-  rotaryEncoder.setAcceleration(250);
+	rotaryEncoder.setBoundaries(0, 9, true); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
+  rotaryEncoder.setAcceleration(0);
+  rotaryEncoder.setEncoderValue(0);
 
 
   lv_indev_drv_init(&indev_drv_button_enc);
   indev_drv_button_enc.type=LV_INDEV_TYPE_ENCODER;
   indev_drv_button_enc.read_cb=encoder_with_keys_read;
+  // indev_drv_button_enc.long_press_time=2000;
+  indev_drv_button_enc.long_press_repeat_time=2000;
   my_indev_button_enc= lv_indev_drv_register(&indev_drv_button_enc);
 
 

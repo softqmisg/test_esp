@@ -31,7 +31,7 @@ VCC                    any microcontroler output pin - but set also ROTARY_ENCOD
 //depending on your encoder - try 1,2 or 4 to get expected behaviour
 //#define ROTARY_ENCODER_STEPS 1
 //#define ROTARY_ENCODER_STEPS 2
-#define ROTARY_ENCODER_STEPS 4
+#define ROTARY_ENCODER_STEPS 2
 
 //instead of changing here, rather change numbers above
 AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
@@ -52,11 +52,26 @@ void rotary_onButtonClick()
 
 void rotary_loop()
 {
+	static int32_t last_diff=0;
 	//dont print anything unless value changed
 	if (rotaryEncoder.encoderChanged())
 	{
-		Serial.print("Value: ");
-		Serial.println(rotaryEncoder.readEncoder());
+		int32_t cur_diff=rotaryEncoder.readEncoder();
+		int32_t diff=cur_diff-last_diff;
+		Serial.print("Values: ");
+		Serial.println(String(cur_diff)+"-"+String(last_diff)+"="+String(diff));
+		if(diff>2)
+			diff=8-diff;
+		if(diff<-2)
+			diff=10+diff;
+
+
+		if(diff>0) 
+			Serial.println("LEFT");
+		else
+			Serial.println("RIGHT");
+
+		last_diff=cur_diff;
 	}
 	if (rotaryEncoder.isEncoderButtonClicked())
 	{
@@ -79,7 +94,7 @@ void setup()
 	//set boundaries and if values should cycle or not
 	//in this example we will set possible values between 0 and 1000;
 	bool circleValues = true;
-	rotaryEncoder.setBoundaries(0, 1000, circleValues); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
+	rotaryEncoder.setBoundaries(0, 9, circleValues); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
 
 	/*Rotary acceleration introduced 25.2.2021.
    * in case range to select is huge, for example - select a value between 0 and 1000 and we want 785
@@ -87,8 +102,9 @@ void setup()
    * Using acceleration, faster you turn, faster will the value raise.
    * For fine tuning slow down.
    */
-	//rotaryEncoder.disableAcceleration(); //acceleration is now enabled by default - disable if you dont need it
-	rotaryEncoder.setAcceleration(250); //or set the value - larger number = more accelearation; 0 or 1 means disabled acceleration
+	rotaryEncoder.disableAcceleration(); //acceleration is now enabled by default - disable if you dont need it
+	// rotaryEncoder.setAcceleration(250); //or set the value - larger number = more accelearation; 0 or 1 means disabled acceleration
+	rotaryEncoder.setEncoderValue(0);
 }
 
 void loop()
