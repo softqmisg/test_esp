@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <time.h>
 #include "demo.h"
-extern lv_indev_t *my_indev;
+extern lv_indev_t *my_indev_button_enc;
+
+
 #if LV_USE_DEMO_TEST
 lv_obj_t* switch_menu;
 static void switch_menu_handler(lv_event_t *e)
@@ -30,7 +32,8 @@ void  demo_test_create(){
 
     lv_group_t * g = lv_group_create();
     lv_group_set_default(g);
-    lv_indev_set_group(my_indev,g); 
+    // lv_indev_set_group(my_indev_button,g); 
+    lv_indev_set_group(my_indev_button_enc,g); 
 
     lv_obj_t *label=lv_label_create(lv_scr_act());
     lv_obj_set_pos(label,100,0);

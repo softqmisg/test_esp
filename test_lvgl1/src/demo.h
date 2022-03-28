@@ -29,10 +29,9 @@ extern "C" {
 #define LV_USE_DEMO6    0
 #define LV_USE_DEMO7    0
 #define LV_USE_DEMO8    0
-#define LV_USE_DEMO9    1
-#define LV_USE_DEMO_TEST 0
+#define LV_USE_DEMO9    0
+#define LV_USE_DEMO_TEST 1
 
-#define LV_USE_DEMO_TEST 0
 
 
 /**********************

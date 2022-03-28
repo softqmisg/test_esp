@@ -1,3 +1,4 @@
+#include "AiEsp32RotaryEncoder.h"
 #include <Arduino.h>
 #include "SPI.h"
 // #include "TouchScreen.h"
@@ -7,6 +8,15 @@
 extern  lv_obj_t *switch_menu;
 #endif
 #define TFT_BL_PIN  2
+
+#define ROTARY_ENCODER_A_PIN 34 //clk
+#define ROTARY_ENCODER_B_PIN 35 //dat
+#define ROTARY_ENCODER_BUTTON_PIN 4
+#define ROTARY_ENCODER_VCC_PIN -1 
+#define ROTARY_ENCODER_STEPS 2
+AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
+
+
 // #define YP 26
 // #define XM 25
 // #define YM 32
@@ -19,8 +29,8 @@ static lv_disp_draw_buf_t disp_buf;
 static lv_color_t buf[TFT_WIDTH * 10];
 lv_disp_drv_t disp_drv;
 // lv_indev_drv_t indev_drv;
-lv_indev_drv_t indev_drv_button;
-lv_indev_t *my_indev;
+lv_indev_drv_t indev_drv_button_enc;
+lv_indev_t *my_indev_button_enc;
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -56,7 +66,10 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
 //   // return false; /*No buffering now so no more data read*/
 // }
-
+void IRAM_ATTR readEncoderISR()
+{
+	rotaryEncoder.readEncoder_ISR();
+}
 int my_keys_read(void)
 {
   int ID=-1;//LV_KEY_ENTER; LV_KEY_RIGHT ;//LV_KEY_LEFT
@@ -79,25 +92,38 @@ int my_keys_read(void)
       ID=LV_KEY_ENTER;
   }
 
-  if(!digitalRead(PIN_MENU))
+  // if(!digitalRead(PIN_MENU))
+  // {
+  //   delay(10);
+  //   if(!digitalRead(PIN_MENU))
+  //   {
+  //     ID='m';
+  //   }
+  // } 
+  if(rotaryEncoder.isEncoderButtonClicked())
   {
-    delay(10);
-    if(!digitalRead(PIN_MENU))
-    {
-      ID='m';
-    }
-  }    
+      ID=LV_KEY_ENTER;
+  }   
   return ID;
 }
+int32_t get_encoder_move(void)
+{
+  static int32_t last_diff=0;
+  int32_t cur_diff=rotaryEncoder.readEncoder();
+  int32_t diff=cur_diff-last_diff;
+  last_diff=cur_diff;
+  if(last_diff==1000) last_diff=-1;
+  if(last_diff==0)  last_diff=1001;
 
+  return diff;
+}
 void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
   static uint32_t last_btn = 0;   /*Store the last pressed button*/
   int key_pr = my_keys_read();     /* use LV_KEY_ENTER for encoder press */
   if(key_pr>=0)
   {
     last_btn = key_pr;            /*Get the last pressed or released key*/
-                                     
-    data->state = LV_INDEV_STATE_PR;
+    data->state = LV_INDEV_STATE_PRESSED;
   #if LV_USE_DEMO6
     if(key_pr=='m')
     {
@@ -119,13 +145,16 @@ void encoder_with_keys_read(lv_indev_drv_t *drv, lv_indev_data_t *data){
   }
   else
   {
-    data->state = LV_INDEV_STATE_REL;
+    data->state = LV_INDEV_STATE_RELEASED;
+    if(rotaryEncoder.encoderChanged())
+    {
+      data->enc_diff=get_encoder_move();
+      last_btn = data->enc_diff < 0 ? LV_KEY_LEFT : LV_KEY_RIGHT;      
+    }
   }
  data->key = last_btn;
-
-
-
 }
+
 
 static void my_log(const char *buf)
 {
@@ -195,10 +224,18 @@ void setup() {
   // indev_drv.read_cb = my_input_read;
   // lv_indev_drv_register(&indev_drv);
 
-  lv_indev_drv_init(&indev_drv_button);
-  indev_drv_button.type=LV_INDEV_TYPE_KEYPAD;
-  indev_drv_button.read_cb=encoder_with_keys_read;
-  my_indev= lv_indev_drv_register(&indev_drv_button);
+	rotaryEncoder.begin();
+	rotaryEncoder.setup(readEncoderISR);
+	rotaryEncoder.setBoundaries(0, 1000, true); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
+  rotaryEncoder.setAcceleration(250);
+
+
+  lv_indev_drv_init(&indev_drv_button_enc);
+  indev_drv_button_enc.type=LV_INDEV_TYPE_ENCODER;
+  indev_drv_button_enc.read_cb=encoder_with_keys_read;
+  my_indev_button_enc= lv_indev_drv_register(&indev_drv_button_enc);
+
+
   
   // see also lv_group_create && lv_group_add_obj && lv_indev_set_group
   // https://docs.lvgl.io/8/overview/indev.html?highlight=lv_indev_set_button_points#groups
