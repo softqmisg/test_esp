@@ -31,6 +31,41 @@ static void lv_spinbox_cb(lv_obj_t *e)
 {
     
 }
+
+static void ta_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * ta = lv_event_get_target(e);
+    lv_obj_t * kb = lv_event_get_user_data(e);
+    if(code == LV_EVENT_FOCUSED) {
+        lv_keyboard_set_textarea(kb, ta);
+        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        // lv_obj_t *g=lv_obj_get_group(kb);
+        // lv_group_focus_next(g);
+        lv_group_focus_obj(kb);
+    }
+
+}
+static void kb_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * kb = lv_event_get_target(e);
+    lv_obj_t * g = lv_event_get_user_data(e);
+
+    if(code==LV_EVENT_CANCEL )
+    {
+        lv_keyboard_set_textarea(kb, NULL);
+        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_group_focus_next(g);
+        lv_group_set_editing(g,false);
+    }
+    if(code==LV_EVENT_DEFOCUSED)
+    {
+        lv_keyboard_set_textarea(kb, NULL);
+        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);        
+    }    
+}
+
 void  demo_test_create(){
 
 
@@ -61,7 +96,7 @@ void  demo_test_create(){
     lv_obj_add_event_cb(spinbox,lv_spinbox_cb,LV_EVENT_CLICKED,NULL);
 
     lv_obj_t * dd = lv_dropdown_create(lv_scr_act());
-    lv_obj_set_pos(dd,200,50);
+    lv_obj_set_pos(dd,250,50);
 
     lv_dropdown_set_options(dd, "Apple\n"
                             "Banana\n"
@@ -76,7 +111,17 @@ void  demo_test_create(){
 
     lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
 
+    lv_obj_t * ta;
+    ta = lv_textarea_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
 
+    lv_obj_set_pos(ta,160,70);
+    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_set_size(ta, 140, 50);
+    lv_keyboard_set_textarea(kb, ta);
+    lv_obj_add_event_cb(kb,kb_event_cb,LV_EVENT_ALL,g);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    // lv_keyboard_set_popovers(kb, true);
 }
 #endif
 #if LV_USE_DEMO9
